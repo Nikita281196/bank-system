@@ -1,0 +1,108 @@
+﻿<Window x:Class="Homework11.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        xmlns:local="clr-namespace:Homework11"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="1980" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="871*"/>
+            <ColumnDefinition Width="115*"/>
+        </Grid.ColumnDefinitions>
+        <ListView x:Name="dbClients" 
+                  Margin="2" 
+                  Grid.Column="0">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding Surname}"
+                        Header="Фамилия" 
+                        Width="120"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding Name}"
+                        Header="Имя" 
+                        Width="90"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding Patronymic}"
+                        Header="Отчество" 
+                        Width="122"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding PhoneNumber}"
+                        Header="Номер телефона" 
+                        Width="170"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding PassData}"
+                        Header="Паспортные данные" 
+                        Width="193"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding DateTime}"
+                        Header="Дата/время"                       
+                        Width="140"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding DataChanged}"
+                        Header="Измененные данные" 
+                        Width="400"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding TypeOfChanged}"
+                        Header="Тип изменений" 
+                        Width="335"/>
+                    <GridViewColumn
+                        DisplayMemberBinding="{Binding WhoChanged}"
+                        Header="Кто изменил" 
+                        Width="150"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Border BorderBrush="Black" 
+                BorderThickness="1" 
+                Grid.Column="1" 
+                HorizontalAlignment="Stretch" Margin="2" 
+                VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="89*"/>
+                    <RowDefinition Height="668*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="Выбор уровня доступа" Grid.Row="0">
+                    <StackPanel>
+                        <RadioButton x:Name="ConsultantCheck"  Content="Консультант" Checked="Consultant_Checked" />
+                        <RadioButton x:Name="ManagerCheck" Content="Менеджер" Checked="Manager_Checked" />
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Обработка данных" Grid.Row="1">
+                    <StackPanel x:Name="Manager">
+                        <TextBlock Text="Фамилия" Margin="2"/>
+                        <TextBox x:Name="Surname" Margin="2"/>
+                        <TextBlock Text="Имя" Margin="2"/>
+                        <TextBox x:Name="NameClient"  Margin="2"/>
+                        <TextBlock Text="Отчество" Margin="2"/>
+                        <TextBox x:Name="Patronymic" Margin="2"/>
+                        <TextBlock Text="Номер телефона" Margin="2"/>
+                        <TextBox x:Name="PhoneNumber"  Margin="2"/>
+                        <TextBlock Text="Паспортные данные" Margin="2"/>
+                        <TextBox x:Name="PassportData" Margin="2"/>
+                        <Button x:Name="AddClient" Content="Добавить клиента" Click="Add_Client_Button" Margin="2" />
+                        <Button x:Name="ChangeClient" Content="Изменить данные" Click="Data_Client_Change_Button" Margin="2"/>
+                    </StackPanel>
+
+                </GroupBox>
+            </Grid>
+
+
+
+
+
+
+        </Border>
+    </Grid>
+</Window>
