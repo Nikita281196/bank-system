@@ -13,9 +13,9 @@ namespace Homework11
     public partial class MainWindow : Window
     {
         ObservableCollection<Client> clients;
-        Manager manager;
-        Consultant consultant;
-        
+        Repository repositoryforConsultant;
+        Repository repositoryforManager;
+
         public MainWindow()
         {
             InitializeComponent();           
@@ -29,24 +29,9 @@ namespace Homework11
         private void Consultant_Checked(object sender, RoutedEventArgs e)
         {
             clients = new ObservableCollection<Client>();
-            using (StreamReader sr = new StreamReader(@"Notes.csv"))
-            {
-                while (!sr.EndOfStream)
-                {
-                    string[] vs = sr.ReadLine().Split(',');                    
-                    consultant = new Consultant(vs[0], vs[1], vs[2], long.Parse(vs[3]), vs[4], vs[5], vs[6], vs[7], vs[8]);
+            repositoryforConsultant = new Repository(clients);
 
-                    clients.Add(new Client(consultant.Surname,
-                        consultant.Name,
-                        consultant.Patronymic,
-                        consultant.PhoneNumber,
-                        consultant.passData,
-                        consultant.DateTime,
-                        consultant.DataChanged,
-                        consultant.TypeOfChanged,
-                        consultant.WhoChanged));
-                }
-            }
+            clients = repositoryforConsultant.FillClientForConsultant();
             dbClients.ItemsSource = clients;
         }
 
@@ -58,24 +43,9 @@ namespace Homework11
         private void Manager_Checked(object sender, RoutedEventArgs e)
         {
             clients = new ObservableCollection<Client>();
-            using (StreamReader sr = new StreamReader(@"Notes.csv"))
-            {
-                while (!sr.EndOfStream)
-                {
-                    string[] vs = sr.ReadLine().Split(',');
-                    manager = new Manager(vs[0], vs[1], vs[2], long.Parse(vs[3]), vs[4], vs[5], vs[6], vs[7], vs[8]);
-                    
-                    clients.Add(new Client(manager.Surname,
-                        manager.Name,
-                        manager.Patronymic,
-                        manager.PhoneNumber,
-                        manager.PassData.ToString(),
-                        manager.DateTime,
-                        manager.DataChanged,
-                        manager.TypeOfChanged,
-                        manager.WhoChanged));
-                }
-            }
+            repositoryforManager = new Repository(clients);
+          
+            clients = repositoryforManager.FillClientForManager();
             dbClients.ItemsSource = clients;
         }
 
@@ -86,14 +56,11 @@ namespace Homework11
         /// <param name="e"></param>
         private void Add_Client_Button(object sender, RoutedEventArgs e)
         {
+            
             if (ManagerCheck.IsChecked==true)
-            {                
-                if (CheckFieldForManager())
-                {
-                    clients.Add(new Client(Surname.Text, NameClient.Text, Patronymic.Text,
-                        long.Parse(PhoneNumber.Text), PassportData.Text));
-                    manager.Save(clients);
-                }               
+            {
+                repositoryforManager.AddClient(Surname.Text, NameClient.Text, Patronymic.Text,
+                        PhoneNumber.Text, PassportData.Text);                             
             }
             else if (ConsultantCheck.IsChecked==true)
                 MessageBox.Show("Выберите верный уровень доступа", "Внимание", MessageBoxButton.OK);            
@@ -112,11 +79,14 @@ namespace Homework11
             {
                 try
                 {
-                    if (CheckFieldForManager())
-                    {
-                        ManagerDataUpdate();
-                        manager.Save(clients);
-                    }
+                    string[] DataBeforeChange = new string[] { clients[dbClients.SelectedIndex].Surname, clients[dbClients.SelectedIndex].Name,
+                                              clients[dbClients.SelectedIndex].Patronymic, clients[dbClients.SelectedIndex].PhoneNumber.ToString(),
+                                              clients[dbClients.SelectedIndex].PassData.ToString()};
+                    string[] DataAfterChange = new string[]{ Surname.Text, NameClient.Text, Patronymic.Text,
+                                            PhoneNumber.Text, PassportData.Text};
+                    
+                    repositoryforManager.ChangeManager(DataBeforeChange, DataAfterChange, dbClients.SelectedIndex, Surname.Text, NameClient.Text, Patronymic.Text, PhoneNumber.Text, PassportData.Text);
+                    
                     
                 }
                 catch (Exception error)
@@ -141,11 +111,7 @@ namespace Homework11
                 {
                     try
                     {
-                        if (CheckFieldForConsultant())
-                        {
-                            ConsultantDataUpdate();
-                            consultant.Save(clients);
-                        }
+                        repositoryforConsultant.ChangeConsultant(clients[dbClients.SelectedIndex].PhoneNumber.ToString(), PhoneNumber.Text, dbClients.SelectedIndex);                       
                         
                     }
                     catch (Exception error)
@@ -169,106 +135,10 @@ namespace Homework11
         }
 
         /// <summary>
-        /// Изменение данных менеджером
+        /// Метод сортировки
         /// </summary>
-        public void ManagerDataUpdate()
-        {
-            string[] DataBeforeChange;
-            string[] DataAfterChange;
-            DataBeforeChange = new string[] { clients[dbClients.SelectedIndex].Surname, clients[dbClients.SelectedIndex].Name,
-                                              clients[dbClients.SelectedIndex].Patronymic, clients[dbClients.SelectedIndex].PhoneNumber.ToString(), 
-                                              clients[dbClients.SelectedIndex].PassData.ToString()};
-            DataAfterChange = new string[]{ Surname.Text, NameClient.Text, Patronymic.Text,
-                                            PhoneNumber.Text, PassportData.Text};
-            string[] Field = new string[] { "Фамилия", "Имя", "Отчество", "Номер телефона", "Паспортные данные" };
-            string[] TypeChange = new string[] { "Удалено", "Изменено" };
-            string TypeOfChange = "";
-            string DataChanged = "";
-            for (int i = 0; i < DataBeforeChange.Length; i++)
-            {
-                if (DataBeforeChange[i] != DataAfterChange[i])
-                {
-                    DataChanged += $"{Field[i]} ";
-                    if (DataAfterChange[i] == String.Empty) TypeOfChange += $"{TypeChange[0]} ";
-                    else TypeOfChange += $"{TypeChange[1]} ";
-                }
-            }
-            string Date = DateTime.Now.ToShortDateString();
-            string Time = DateTime.Now.ToShortTimeString();          
-            manager.ManagerChange(clients, dbClients.SelectedIndex, Surname.Text, NameClient.Text, Patronymic.Text, 
-                long.Parse(PhoneNumber.Text), PassportData.Text, $"{Date} {Time}", DataChanged, TypeOfChange,"Менеджер");
-        }
-
-        /// <summary>
-        /// Изменение данных консультантом
-        /// </summary>
-        public void ConsultantDataUpdate()
-        {
-            if (clients[dbClients.SelectedIndex].PhoneNumber.ToString()==String.Empty)
-            {
-                MessageBox.Show("Вы не можете изменить пустое поле",
-                                "Внимание",
-                                MessageBoxButton.OK);
-            }
-            else
-            {
-                string PhoneNumberBeforeChange = clients[dbClients.SelectedIndex].PhoneNumber.ToString();
-                string PhoneNumberAfterChange = PhoneNumber.Text;
-                string Field = "Номер телефона";
-                string[] TypeChange = new string[] { "Удалено", "Изменено" };
-                string TypeOfChange = "";
-                string DataChanged = "";
-                if (PhoneNumberBeforeChange != PhoneNumberAfterChange)
-                {
-                    DataChanged += $"{Field}";
-                    if (PhoneNumberAfterChange == String.Empty) TypeOfChange += $"{TypeChange[0]} ";
-                    else TypeOfChange += $"{TypeChange[1]} ";
-                }
-                string Date = DateTime.Now.ToShortDateString();
-                string Time = DateTime.Now.ToShortTimeString();
-                consultant.ConsultantChange(clients, dbClients.SelectedIndex, long.Parse(PhoneNumber.Text),
-                    $"{Date} {Time}", DataChanged, TypeOfChange, "Консультант");
-            }
-            
-        }
-
-        /// <summary>
-        /// Проверка данных на корректный тип у менеджера
-        /// </summary>
-        public bool CheckFieldForManager()
-        {
-            bool chechFiled = false;
-            long check;
-            if (PassportData.Text == String.Empty | PhoneNumber.Text == String.Empty |
-                Surname.Text == String.Empty | NameClient.Text == String.Empty | Patronymic.Text == String.Empty)
-                MessageBox.Show("Заполните пустые поля");
-            else if (!long.TryParse(PassportData.Text, out check) | !long.TryParse(PhoneNumber.Text, out check))
-                MessageBox.Show("Неверное число в поле ввода!");
-            else
-            {
-                chechFiled=true;                
-            }
-            return chechFiled;
-        }
-
-        /// <summary>
-        /// Проверка данных на корректный тип у консультанта
-        /// </summary>
-        public bool CheckFieldForConsultant()
-        {
-            bool chechFiled = false;
-            long check;
-            if (PhoneNumber.Text == String.Empty)
-                MessageBox.Show("Заполните пустое поле: \nНомер телефона");
-            else if (!long.TryParse(PhoneNumber.Text, out check))
-                MessageBox.Show("Неверное число в поле ввода!");
-            else
-            {
-                chechFiled = true;               
-            }
-            return chechFiled;
-        }      
-
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Data_Client_Sort_Button(object sender, RoutedEventArgs e)
         {
             var sortedClient = clients.OrderBy(i => i.Surname);

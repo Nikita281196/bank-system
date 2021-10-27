@@ -9,16 +9,7 @@ namespace Homework11
 {
     interface InterfaceForManager
     {
-        void ManagerChange(
-            ObservableCollection<Client> clients, int index, string Surname, 
-            string Name, 
-            string Patronymic,
-            long PhoneNumber,
-            string PassData,
-            string DateTime,
-            string DataChanged,
-            string TypeOfChanged,
-            string WhoChanged
-            );
+        void ManagerChange(ObservableCollection<Client> clients, int index, string Surname, string Name, string Patronymic,
+            long PhoneNumber, string PassData, string DateTime, string DataChanged, string TypeOfChanged, string WhoChanged);
     }
 }

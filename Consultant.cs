@@ -66,8 +66,6 @@ namespace Homework11
         }
         #endregion
 
-        
-
         /// <summary>
         /// Метод изменения данных для консультанта
         /// </summary>

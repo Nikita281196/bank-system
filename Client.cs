@@ -20,6 +20,7 @@ namespace Homework11
         public string TypeOfChanged { get; set; }
         public string WhoChanged { get; set; }
         #endregion
+
         #region Конструкторы
         public Client(string Surname, 
             string Name, 
