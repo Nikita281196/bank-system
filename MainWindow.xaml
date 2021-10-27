@@ -93,6 +93,7 @@
                         <TextBox x:Name="PassportData" Margin="2"/>
                         <Button x:Name="AddClient" Content="Добавить клиента" Click="Add_Client_Button" Margin="2" />
                         <Button x:Name="ChangeClient" Content="Изменить данные" Click="Data_Client_Change_Button" Margin="2"/>
+                        <Button x:Name="CortClient" Content="Сортировать данные" Click="Data_Client_Sort_Button" Margin="2"/>
                     </StackPanel>
 
                 </GroupBox>

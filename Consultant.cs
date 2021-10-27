@@ -66,22 +66,7 @@ namespace Homework11
         }
         #endregion
 
-        /// <summary>
-        /// Метод изменения паспортных данных на *
-        /// </summary>
-        /// <returns></returns>
-        //public string GetFormattesPassportData()
-        //{
-        //    StringBuilder stringBuilder = new StringBuilder(PassData.ToString());
-        //    if (PassData.ToString() != String.Empty)
-        //    {
-        //        for (int i = 0; i < PassData.ToString().Length; i++)
-        //        {
-        //            stringBuilder.Replace(stringBuilder[i], '*');
-        //        }
-        //    }           
-        //    return stringBuilder.ToString();
-        //}
+        
 
         /// <summary>
         /// Метод изменения данных для консультанта

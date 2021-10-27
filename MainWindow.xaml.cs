@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 
 namespace Homework11
@@ -86,24 +87,13 @@ namespace Homework11
         private void Add_Client_Button(object sender, RoutedEventArgs e)
         {
             if (ManagerCheck.IsChecked==true)
-            {
-                string temp = String.Format(
-                        Surname.Text,
-                        NameClient.Text,
-                        Patronymic.Text,
-                        PhoneNumber.Text,
-                        PassportData.Text);
-                if (temp != String.Empty)
+            {                
+                if (CheckFieldForManager())
                 {
-                    clients.Add(new Client(Surname.Text,
-                        NameClient.Text,
-                        Patronymic.Text,
-                        long.Parse(PhoneNumber.Text),
-                        PassportData.Text));
+                    clients.Add(new Client(Surname.Text, NameClient.Text, Patronymic.Text,
+                        long.Parse(PhoneNumber.Text), PassportData.Text));
                     manager.Save(clients);
-                }
-                else
-                    MessageBox.Show("Заполните хотя бы одно поле", "Внимание", MessageBoxButton.OK);
+                }               
             }
             else if (ConsultantCheck.IsChecked==true)
                 MessageBox.Show("Выберите верный уровень доступа", "Внимание", MessageBoxButton.OK);            
@@ -122,11 +112,15 @@ namespace Homework11
             {
                 try
                 {
-                    CheckFieldForManager();
+                    if (CheckFieldForManager())
+                    {
+                        ManagerDataUpdate();
+                        manager.Save(clients);
+                    }
+                    
                 }
                 catch (Exception error)
-                {
-                    
+                {                
                     if (error != null)
                     {
                         MessageBox.Show("Выберите клиента данные которого хотите изменить",
@@ -147,7 +141,12 @@ namespace Homework11
                 {
                     try
                     {
-                        CheckFieldForConsultant();
+                        if (CheckFieldForConsultant())
+                        {
+                            ConsultantDataUpdate();
+                            consultant.Save(clients);
+                        }
+                        
                     }
                     catch (Exception error)
                     {
@@ -236,25 +235,28 @@ namespace Homework11
         /// <summary>
         /// Проверка данных на корректный тип у менеджера
         /// </summary>
-        public void CheckFieldForManager()
+        public bool CheckFieldForManager()
         {
+            bool chechFiled = false;
             long check;
-            if (PassportData.Text == String.Empty & PhoneNumber.Text == String.Empty)
-                MessageBox.Show("Заполните пустые поля: \nНомер телефона\nПаспортные данные");
-            else if (!long.TryParse(PassportData.Text, out check) & !long.TryParse(PhoneNumber.Text, out check))
+            if (PassportData.Text == String.Empty | PhoneNumber.Text == String.Empty |
+                Surname.Text == String.Empty | NameClient.Text == String.Empty | Patronymic.Text == String.Empty)
+                MessageBox.Show("Заполните пустые поля");
+            else if (!long.TryParse(PassportData.Text, out check) | !long.TryParse(PhoneNumber.Text, out check))
                 MessageBox.Show("Неверное число в поле ввода!");
             else
             {
-                ManagerDataUpdate();
-                manager.Save(clients);
+                chechFiled=true;                
             }
+            return chechFiled;
         }
 
         /// <summary>
         /// Проверка данных на корректный тип у консультанта
         /// </summary>
-        public void CheckFieldForConsultant()
+        public bool CheckFieldForConsultant()
         {
+            bool chechFiled = false;
             long check;
             if (PhoneNumber.Text == String.Empty)
                 MessageBox.Show("Заполните пустое поле: \nНомер телефона");
@@ -262,10 +264,15 @@ namespace Homework11
                 MessageBox.Show("Неверное число в поле ввода!");
             else
             {
-                ConsultantDataUpdate();
-                consultant.Save(clients);
+                chechFiled = true;               
             }
-        }
+            return chechFiled;
+        }      
 
+        private void Data_Client_Sort_Button(object sender, RoutedEventArgs e)
+        {
+            var sortedClient = clients.OrderBy(i => i.Surname);
+            dbClients.ItemsSource = sortedClient;
+        }
     }
 }
